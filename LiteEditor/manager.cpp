@@ -561,7 +561,17 @@ void Manager::CreateProject(ProjectData& data, const wxString& workspaceFolder)
         data.m_srcProject->GetFilesAsVectorOfFileName(files);
         for(size_t i = 0; i < files.size(); i++) {
             wxFileName f(files.at(i));
-            wxCopyFile(f.GetFullPath(), f.GetFullName());
+			//construct new relative path
+			wxString npath(f.GetPath());
+            wxString project_path = data.m_srcProject->GetProjectPath();
+            npath.Replace(project_path, ".");
+            
+            wxFileName nf(npath, f.GetFullName(), wxPATH_NATIVE);
+            if(!wxFileName::DirExists(npath))
+            {
+                wxFileName::Mkdir(npath, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+            }
+            wxCopyFile(f.GetFullPath(), nf.GetFullPath());
         }
     }
 
